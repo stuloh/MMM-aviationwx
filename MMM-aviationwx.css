@@ -1,0 +1,40 @@
+.top-align {
+  vertical-align: top;
+}
+
+.bottom-align {
+  vertical-align: bottom;
+}
+
+.vfr {
+  color: green;
+}
+
+.mvfr {
+  color: blue;
+}
+
+.ifr {
+  color: red;
+}
+
+.lifr {
+  color: #f0f;
+}
+
+.minor-delay {
+  color: yellow;
+}
+
+.major-delay {
+  color: red;
+}
+
+.nodec a, .nodec a:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+.nodec a:hover {
+  text-decoration: underline;
+}
