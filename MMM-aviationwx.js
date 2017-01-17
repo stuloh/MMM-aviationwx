@@ -63,6 +63,7 @@ Module.register("MMM-aviationwx", {
     airportH.innerHTML = "Airport";
     headerRow.appendChild(airportH);
     var wxH = document.createElement("th");
+    wxH.className = "left-align";
     wxH.innerHTML = "Weather";
     headerRow.appendChild(wxH);
     table.appendChild(headerRow);
@@ -72,6 +73,8 @@ Module.register("MMM-aviationwx", {
 
     // Format data for each airport
     var airportList = this.config.airports.split(",");
+    airportList = airportList.map(function (ap) { return ap.trim(); });
+
     var notFound = "";
     for (var i = 0; i < airportList.length; i++) {
       var airportKey = (airportList[i].length === 3) ? "K" + airportList[i] : airportList[i];
@@ -93,6 +96,7 @@ Module.register("MMM-aviationwx", {
       var dewpoint = parseInt(airport.dewp);
       var winddir = this.padZeroes(airport.wdir, 3);
       var windspeed = this.padZeroes(airport.wspd, 2);
+      var wind = (windspeed > 0) ? winddir + "@" + windspeed + "kt" : "CALM";
       var visibility = airport.visib;
       var wx = airport.wx || "";
       var cover = airport.cover;
@@ -107,6 +111,8 @@ Module.register("MMM-aviationwx", {
       // Check if FAA delay data for airport exists
       if ("FAA" in airport) {
         if (airport.FAA.delay === "true") {
+          // See http://www.fly.faa.gov/Products/Glossary_of_Terms/glossary_of_terms.html
+          // for common FAA delay abbreviations
           var delay = 1;
           var delayReason = airport.FAA.status.reason;
           var delayType = airport.FAA.status.type;
@@ -114,9 +120,9 @@ Module.register("MMM-aviationwx", {
           var delayAvg = airport.FAA.status.avgDelay;
           var maxDelay = airport.FAA.status.maxDelay;
           var delayTime;
-          if (minDelay) delayTime = minDelay;
-          if (delayAvg) delayTime = delayAvg;
-          if (maxDelay) delayTime = maxDelay;
+          if (minDelay) delayTime = "Min delays of " + minDelay;
+          if (delayAvg) delayTime = "Avg delays of " + delayAvg;
+          if (maxDelay) delayTime = "Max delays of " + maxDelay;
         } else {
           var delay = 2;
         }
@@ -138,7 +144,7 @@ Module.register("MMM-aviationwx", {
 
       // Show Airport Name and any delays
       var nameCell = document.createElement("td");
-      nameCell.className = "bright nodec";
+      nameCell.className = "bright nodec left-align";
       var tafUrl = "https://aviationweather.gov/taf/data?ids=" + icao + "&format=decoded&metars=on&layout=on";
       nameCell.innerHTML = this.wrapInLink(iata, tafUrl) + "&nbsp;";
       nameCell.setAttribute("title", name + " Airport");
@@ -166,15 +172,15 @@ Module.register("MMM-aviationwx", {
 
       // Show WX
       var wxCell = document.createElement("td");
-      wxCell.className = "xsmall bottom-align";
+      wxCell.className = "xsmall bottom-align left-align";
       wxCell.setAttribute("title", rawMETAR);
-      wxCell.innerHTML = "<b>" + winddir + "@" + windspeed + "kt " +
+      wxCell.innerHTML = "<b>" + wind + " " +
                          visibility + "SM " + ceiling + " " +
                          temp + "/" + dewpoint + "</b> " + wx + "&nbsp; " +
                          obsTimeMoment.format("[(]HH:mm[)]");
       if (delay === 1) {
         wxCell.innerHTML += "<br>Delays due to " + delayReason + " (" + delayType + ")"; 
-        wxCell.innerHTML += "<br>Max delays of " + delayTime;
+        wxCell.innerHTML += "<br>" + delayTime;
       }
       row.appendChild(wxCell);
 

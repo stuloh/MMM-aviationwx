@@ -24,7 +24,10 @@ module.exports = NodeHelper.create({
     var airportData = new Object();
 
     // Convert to US ICAO codes
-    airports = airports.map(function(airport) { return (airport.length < 4) ? "K" + airport : airport; });
+    airports = airports.map(function(airport) {
+      airport = airport.trim();
+      return (airport.length < 4) ? "K" + airport : airport;
+    });
     
     // Track number of HTTP requests to be made
     var numAirports = airports.length;
