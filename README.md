@@ -2,7 +2,7 @@
 
 This is a module for <a href="https://github.com/MichMich/MagicMirror">MagicMirror</a>.
 
-`MMM-aviationwx` displays aviation weather information (METAR data) for continental U.S. airports on your MagicMirror. If
+`MMM-aviationwx` displays aviation weather information (METAR data) for airports on your MagicMirror. If
 the FAA tracks delay information for that airport, it will also note if there are any current delays and the reason for the delay if the airport has provided one.
 
 The module includes hyperlinks and tooltips that are generally not accessible with a Raspberry PI installation, but will work if you have mouse control (which is more often the case if you run Magic Mirror on another OS, such as macOS).
@@ -29,8 +29,10 @@ modules: [
         header: 'Aviation Weather',
         position: 'top_left',
         config: {
-            airports: 'KSFO,PAO,HAF,JFK', // 3-char or 4-char codes, U.S. only
-            updateInterval: 10, // update interval in minutes
+            		airports: 	"KSFO	,JFK	,LFBD	,ORY", // airports list
+            		US_country:	"Y		,Y		,N		,N",//if the airport is in the US put Y (yes) otherwise put N (no)
+            		updateInterval: 10, // in minutes
+            		legend:1  // show legend for VFR, MVFR, IFR, MIFR
 		}
 	},
 	...
@@ -40,8 +42,10 @@ modules: [
 
 * `position`: See MagicMirror <a href="https://github.com/MichMich/MagicMirror#modules">documentation</a> for usage.
 * `header`: Optional. See MagicMirror documentation for usage.
-* `config.airports`: Comma delimited list of continental U.S. airport codes (no spaces). Supports 3-character FAA codes (which are mostly the same as 3-character IATA codes) or 4-character ICAO codes. 
+* `config.airports`: Comma delimited list of airport codes (spaces and tab allowed). Supports 3-character IATA codes or 4-character ICAO codes.
+* `config.US_country`: Comma delimited to specify if the airports upward is in the US or not(spaces and tab allowed).
 * `config.updateInterval`: How often the module will pull new data in minutes. Airports generally only update every 60 minutes. Additionally, because of how the <a href="https://aviationweather.gov">Aviation Weather Center</a> provides METAR data, each update pulls down the data for most airports in the continental U.S., so I suggest going easy on the update frequency.
+* `config.legend`: to print the color legend for flight categories.
 
 ## Notes
 
@@ -56,7 +60,6 @@ modules: [
 
 * Decoding of wx (`+RA`, `BR`, etc.) to English or icons
 * Decoding of delay abbreviations (`VOL`, etc.)
-* Support for AK, HI and Canadian airports
 * General code and technique clean up
 
 ## License
