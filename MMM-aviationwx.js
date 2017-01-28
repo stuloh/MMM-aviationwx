@@ -24,11 +24,15 @@ Module.register("MMM-aviationwx", {
 
   // Initialize var for storing data
   wxdata: [],
+  airportList:[],
+  
 	
   // Default module configuration variables
 	defaults: {
-		airports: "KSFO,PAO,HAF,JFK", // continental U.S. airports only
-    updateInterval: 10, // in minutes
+		airports: 	"KSFO	,JFK	,LFBD	,ORY", // airports list
+		US_country:	"Y		,Y		,N		,N",//if the airport is in the US put Y (yes) otherwise put N (no)
+    	updateInterval: 10, // in minutes
+    	legend:1  // show legend for VFR, MVFR, IFR, MIFR
 	},
 
   getScripts: function() {
@@ -41,6 +45,13 @@ Module.register("MMM-aviationwx", {
 
   // Entry point for module
   start: function() { 
+  	
+  	// remove white space and tab
+  	this.config.airports	= this.config.airports.replace(/\s/g, ''); 
+    this.config.airports	= this.config.airports.replace(/\t+/g, "");
+    this.config.US_country	= this.config.US_country.replace(/\s/g, '');
+    this.config.US_country	= this.config.US_country.replace('\t','');
+    
     this.getWX();
     this.scheduleUpdate();
   },
@@ -74,12 +85,15 @@ Module.register("MMM-aviationwx", {
     // Format data for each airport
     var airportList = this.config.airports.split(",");
     airportList = airportList.map(function (ap) { return ap.trim(); });
+    var airportContry = this.config.US_country.split(",");
+    airportContry = airportContry.map(function (ap) { return ap.trim(); });
 
     var notFound = "";
+    var airportKey ="";
     for (var i = 0; i < airportList.length; i++) {
-      var airportKey = (airportList[i].length === 3) ? "K" + airportList[i] : airportList[i];
-
-      if (!(airportKey in this.wxdata)) {
+      airportKey = airportList[i];
+      
+      if (!(this.wxdata[airportKey].METAR)) {
         if (airportKey) notFound += airportKey + " ";
         console.log("Error: " + airportKey + " data not found. " +
                     "Check correct code, or airport has stopped reporting METAR for the day.");
@@ -88,43 +102,46 @@ Module.register("MMM-aviationwx", {
 
       // Pull out variables for display
       var airport = this.wxdata[airportKey];
-      var icao = airport.id;
-      var iata = airport.id.substr(1);
-      var name = airport.site;
-      var fltcat = airport.fltcat;
-      var temp = parseInt(airport.temp);
-      var dewpoint = parseInt(airport.dewp);
-      var winddir = this.padZeroes(airport.wdir, 3);
-      var windspeed = this.padZeroes(airport.wspd, 2);
+      var icao = airport.METAR.id;
+      var iata = airport.IATA;
+      var name = airport.METAR.site;
+      var fltcat = airport.METAR.fltcat;
+      var temp = parseInt(airport.METAR.temp);
+      var dewpoint = parseInt(airport.METAR.dewp);
+      var winddir = this.padZeroes(airport.METAR.wdir, 3);
+      var windspeed = this.padZeroes(airport.METAR.wspd, 2);
       var wind = (windspeed > 0) ? winddir + "@" + windspeed + "kt" : "CALM";
-      var visibility = airport.visib;
-      var wx = airport.wx || "";
-      var cover = airport.cover;
-      var ceiling = (airport.ceil) ? cover + " " + airport.ceil : cover;
-      var obsTime = airport.obsTime; // yyyy-mm-ddThh:mm:ssZ
+      var visibility = airport.METAR.visib;
+      var wx = airport.METAR.wx || "";
+      var cover = airport.METAR.cover;
+      var ceiling = (airport.METAR.ceil) ? cover + " " + airport.METAR.ceil : cover;
+      var obsTime = airport.METAR.obsTime; // yyyy-mm-ddThh:mm:ssZ
           obsTime = obsTime.replace("Z", " +0000").replace("T", " ");
       var obsTimeMoment = moment(obsTime, "YYYY-MM-DD HH:mm:ss Z").local();
       var minsSinceObs = moment().diff(obsTimeMoment, "minutes");
-      var rawMETAR = airport.rawOb;
+      var rawMETAR = airport.METAR.rawOb;
       var delay = 0; // 0 = no data, 1 = delay, 2 = no delay
 
-      // Check if FAA delay data for airport exists
-      if ("FAA" in airport) {
-        if (airport.FAA.delay === "true") {
-          // See http://www.fly.faa.gov/Products/Glossary_of_Terms/glossary_of_terms.html
-          // for common FAA delay abbreviations
-          var delay = 1;
-          var delayReason = airport.FAA.status.reason;
-          var delayType = airport.FAA.status.type;
-          var minDelay = airport.FAA.status.minDelay;
-          var delayAvg = airport.FAA.status.avgDelay;
-          var maxDelay = airport.FAA.status.maxDelay;
-          var delayTime;
-          if (minDelay) delayTime = "Min delays of " + minDelay;
-          if (delayAvg) delayTime = "Avg delays of " + delayAvg;
-          if (maxDelay) delayTime = "Max delays of " + maxDelay;
-        } else {
-          var delay = 2;
+	  if (airportContry[i] === "Y") //check for US only airport
+      {
+        // Check if FAA delay data for airport exists
+        if ("FAA" in airport) {
+          if (airport.FAA.delay === "true") {
+            // See http://www.fly.faa.gov/Products/Glossary_of_Terms/glossary_of_terms.html
+            // for common FAA delay abbreviations
+            var delay = 1;
+            var delayReason = airport.FAA.status.reason;
+            var delayType = airport.FAA.status.type;
+            var minDelay = airport.FAA.status.minDelay;
+            var delayAvg = airport.FAA.status.avgDelay;
+            var maxDelay = airport.FAA.status.maxDelay;
+            var delayTime;
+            if (minDelay) delayTime = "Min delays of " + minDelay;
+            if (delayAvg) delayTime = "Avg delays of " + delayAvg;
+            if (maxDelay) delayTime = "Max delays of " + maxDelay;
+          } else {
+            var delay = 2;
+          }
         }
       }
 
@@ -146,7 +163,11 @@ Module.register("MMM-aviationwx", {
       var nameCell = document.createElement("td");
       nameCell.className = "bright nodec left-align";
       var tafUrl = "https://aviationweather.gov/taf/data?ids=" + icao + "&format=decoded&metars=on&layout=on";
-      nameCell.innerHTML = this.wrapInLink(iata, tafUrl) + "&nbsp;";
+      if ( iata === "" || iata ==="999"){ // put ICAO code if IATA doesn't exist
+      	nameCell.innerHTML = this.wrapInLink(icao, tafUrl) + "&nbsp;";
+      }else{
+      	nameCell.innerHTML = this.wrapInLink(iata, tafUrl) + "&nbsp;";
+      }
       nameCell.setAttribute("title", name + " Airport");
       if (delay === 1) {
         var delaySpan = document.createElement("span");
@@ -186,6 +207,72 @@ Module.register("MMM-aviationwx", {
 
       // Append row
       table.appendChild(row);
+      
+    }
+    
+    // Show Legend Flight Category (VFR, MVFR, IFR, LIFR)
+    if(this.config.legend === 1){
+	    var legendRow = document.createElement("tr");
+	    var Legend_container=document.createElement("th");
+	    Legend_container.setAttribute("colSpan", "3");
+	    var statusH = document.createElement("a");
+	    statusH.innerHTML = "Legend: ";
+	    Legend_container.appendChild(statusH);
+	    
+	    //VFR
+	    var statusCell_L_vfr = document.createElement("a");
+	    var statusSpan_L_vfr = document.createElement("span");
+	    statusSpan_L_vfr.className = "vfr";
+	    statusSpan_L_vfr.setAttribute("title", "VFR");
+	    statusSpan_L_vfr.innerHTML = "  &#9673;"
+	    statusCell_L_vfr.appendChild(statusSpan_L_vfr);
+	    Legend_container.appendChild(statusCell_L_vfr);
+	    var Legend_vfr = document.createElement("a");
+	    Legend_vfr.className = "left-align";
+	    Legend_vfr.innerHTML = " VFR";
+	    Legend_container.appendChild(Legend_vfr);
+	    
+	    //MVFR
+	    var statusCell_L_mvfr = document.createElement("a");
+	    var statusSpan_L_mvfr = document.createElement("span");
+	    statusSpan_L_mvfr.className = "mvfr";
+	    statusSpan_L_mvfr.setAttribute("title", "MVFR");
+	    statusSpan_L_mvfr.innerHTML = "  &#9673;"
+	    statusCell_L_mvfr.appendChild(statusSpan_L_mvfr);
+	    Legend_container.appendChild(statusCell_L_mvfr);
+	    var Legend_mvfr = document.createElement("a");
+	    Legend_mvfr.className = "left-align";
+	    Legend_mvfr.innerHTML = " MVFR";
+	    Legend_container.appendChild(Legend_mvfr);
+	    
+	    //IFR
+	    var statusCell_L_ifr = document.createElement("a");
+	    var statusSpan_L_ifr = document.createElement("span");
+	    statusSpan_L_ifr.className = "ifr";
+	    statusSpan_L_ifr.setAttribute("title", "IFR");
+	    statusSpan_L_ifr.innerHTML = "  &#9673;"
+	    statusCell_L_ifr.appendChild(statusSpan_L_ifr);
+	    Legend_container.appendChild(statusCell_L_ifr);
+	    var Legend_ifr = document.createElement("a");
+	    Legend_ifr.className = "left-align";
+	    Legend_ifr.innerHTML = " IFR";
+	    Legend_container.appendChild(Legend_ifr);
+	    
+	    //MIFR
+	    var statusCell_L_mifr = document.createElement("a");
+	    var statusSpan_L_mifr = document.createElement("span");
+	    statusSpan_L_mifr.className = "mifr";
+	    statusSpan_L_mifr.setAttribute("title", "MIFR");
+	    statusSpan_L_mifr.innerHTML = "  &#9673;"
+	    statusCell_L_mifr.appendChild(statusSpan_L_mifr);
+	    Legend_container.appendChild(statusCell_L_mifr);
+	    var Legend_mifr = document.createElement("a");
+	    Legend_mifr.className = "left-align";
+	    Legend_mifr.innerHTML = " MIFR";
+	    Legend_container.appendChild(Legend_mifr);
+	    
+	    legendRow.appendChild(Legend_container);
+	    table.appendChild(legendRow);
     }
 
     // Identify any airports for which data was not retrieved
@@ -229,9 +316,9 @@ Module.register("MMM-aviationwx", {
 
   // Data Handling Functions
   getWX: function () {
-    var metarUrl = "https://aviationweather.gov/gis/scripts/MetarJSON.php?density=all"; 
+    var metarUrl = "https://aviationweather.gov/gis/scripts/MetarJSON.php?density=all&bbox=-180,-90,180,90"; 
     var FAAUrl = "http://services.faa.gov/airport/status/<IATA_CODE>?format=application/json"
-    var payload = [this.config.airports, metarUrl, FAAUrl];
+    var payload = [this.config.airports, this.config.US_country, metarUrl, FAAUrl];
     this.sendSocketNotification("GET_WX", payload);
   },
 
