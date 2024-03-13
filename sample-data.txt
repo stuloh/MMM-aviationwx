@@ -1,0 +1,142 @@
+{
+  "KSFO": {
+    "raw_text": "KSFO 131456Z 28005KT 10SM FEW060 BKN250 09/05 A3022 RMK AO2 SLP233 T00890050 53012",
+    "station_id": "KSFO",
+    "observation_time": "2024-03-13T14:56:00Z",
+    "latitude": "37.6196",
+    "longitude": "-122.366",
+    "temp_c": "8.9",
+    "dewpoint_c": "5",
+    "wind_dir_degrees": "280",
+    "wind_speed_kt": "5",
+    "visibility_statute_mi": "10+",
+    "altim_in_hg": "30.22",
+    "sea_level_pressure_mb": "1023.3",
+    "quality_control_flags": {
+      "auto_station": "TRUE"
+    },
+    "sky_condition": [
+      {
+        "sky_cover": "FEW",
+        "cloud_base_ft_agl": "6000"
+      },
+      {
+        "sky_cover": "BKN",
+        "cloud_base_ft_agl": "25000"
+      }
+    ],
+    "flight_category": "VFR",
+    "three_hr_pressure_tendency_mb": "1.2",
+    "metar_type": "METAR",
+    "elevation_m": "2"
+  },
+  "KPAO": {
+    "raw_text": "KPAO 131447Z VRB05KT 10SM SCT200 07/05 A3022",
+    "station_id": "KPAO",
+    "observation_time": "2024-03-13T14:47:00Z",
+    "latitude": "37.458",
+    "longitude": "-122.112",
+    "temp_c": "7",
+    "dewpoint_c": "5",
+    "wind_dir_degrees": "VRB",
+    "wind_speed_kt": "5",
+    "visibility_statute_mi": "10+",
+    "altim_in_hg": "30.22",
+    "sky_condition": {
+      "sky_cover": "SCT",
+      "cloud_base_ft_agl": "20000"
+    },
+    "flight_category": "VFR",
+    "metar_type": "METAR",
+    "elevation_m": "2"
+  },
+  "KHAF": {
+    "raw_text": "KHAF 131535Z AUTO 00000KT 6SM BR CLR 09/07 A3023 RMK AO2",
+    "station_id": "KHAF",
+    "observation_time": "2024-03-13T15:35:00Z",
+    "latitude": "37.5136",
+    "longitude": "-122.5",
+    "temp_c": "9",
+    "dewpoint_c": "7",
+    "wind_dir_degrees": "0",
+    "wind_speed_kt": "0",
+    "visibility_statute_mi": "6",
+    "altim_in_hg": "30.23",
+    "quality_control_flags": {
+      "auto": "TRUE",
+      "auto_station": "TRUE"
+    },
+    "wx_string": "BR",
+    "sky_condition": {
+      "sky_cover": "CLR"
+    },
+    "flight_category": "VFR",
+    "metar_type": "METAR",
+    "elevation_m": "11"
+  },
+  "KJFK": {
+    "raw_text": "KJFK 131451Z 21003KT 10SM BKN220 12/02 A2996 RMK AO2 SLP145 T01220017 53009",
+    "station_id": "KJFK",
+    "observation_time": "2024-03-13T14:51:00Z",
+    "latitude": "40.6392",
+    "longitude": "-73.7639",
+    "temp_c": "12.2",
+    "dewpoint_c": "1.7",
+    "wind_dir_degrees": "210",
+    "wind_speed_kt": "3",
+    "visibility_statute_mi": "10+",
+    "altim_in_hg": "29.96",
+    "sea_level_pressure_mb": "1014.5",
+    "quality_control_flags": {
+      "auto_station": "TRUE"
+    },
+    "sky_condition": {
+      "sky_cover": "BKN",
+      "cloud_base_ft_agl": "22000"
+    },
+    "flight_category": "VFR",
+    "three_hr_pressure_tendency_mb": "0.9",
+    "metar_type": "METAR",
+    "elevation_m": "3"
+  },
+  "KLAS": {
+    "raw_text": "KLAS 131456Z 33011G21KT 10SM FEW140 14/M03 A2996 RMK AO2 SLP135 T01391028 51014",
+    "station_id": "KLAS",
+    "observation_time": "2024-03-13T14:56:00Z",
+    "latitude": "36.0719",
+    "longitude": "-115.163",
+    "temp_c": "13.9",
+    "dewpoint_c": "-2.8",
+    "wind_dir_degrees": "330",
+    "wind_speed_kt": "11",
+    "wind_gust_kt": "21",
+    "visibility_statute_mi": "10+",
+    "altim_in_hg": "29.96",
+    "sea_level_pressure_mb": "1013.5",
+    "quality_control_flags": {
+      "auto_station": "TRUE"
+    },
+    "sky_condition": {
+      "sky_cover": "FEW",
+      "cloud_base_ft_agl": "14000"
+    },
+    "flight_category": "VFR",
+    "three_hr_pressure_tendency_mb": "1.4",
+    "metar_type": "METAR",
+    "elevation_m": "662",
+    "FAA": {
+      "Ground_Delay": {
+        "ARPT": "LAS",
+        "Reason": "runway maintenance",
+        "Avg": "1 hour and 9 minutes",
+        "Max": "2 hours and 57 minutes"
+      },
+      "Airport_Closure": {
+        "ARPT": "LAS",
+        "Reason": "!LAS 12/067 LAS AD AP CLSD TO NON SKED TRANSIENT GA ACFT EXC PPR 702-261-7775 2312132300-2403132300",
+        "Start": "Dec 13 at 18:00 UTC.",
+        "Reopen": "Mar 13 at 19:00 UTC."
+      }
+    }
+  }
+}

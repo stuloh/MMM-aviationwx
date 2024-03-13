@@ -24,11 +24,14 @@ Module.register("MMM-aviationwx", {
 
   // Initialize var for storing data
   wxdata: [],
+  airportList:[],
 	
   // Default module configuration variables
 	defaults: {
 		airports: "KSFO,PAO,HAF,JFK", // continental U.S. airports only
     updateInterval: 10, // in minutes
+    fadeSpeed: 1000,
+    debug: false
 	},
 
   getScripts: function() {
@@ -40,7 +43,10 @@ Module.register("MMM-aviationwx", {
 	},
 
   // Entry point for module
-  start: function() { 
+  start: function () { 
+    // Format data for each airport
+    this.airportList = this.config.airports.split(",");
+    this.airportList = this.airportList.map(function (ap) { return ap.trim(); });
     this.getWX();
     this.scheduleUpdate();
   },
@@ -69,15 +75,13 @@ Module.register("MMM-aviationwx", {
     table.appendChild(headerRow);
 
     // Abort if no wx data received
-    if (this.wxdata.length < 1) return wrapper;
+    if (Object.keys(this.wxdata).length < 1) return wrapper;
 
-    // Format data for each airport
-    var airportList = this.config.airports.split(",");
-    airportList = airportList.map(function (ap) { return ap.trim(); });
+
 
     var notFound = "";
-    for (var i = 0; i < airportList.length; i++) {
-      var airportKey = (airportList[i].length === 3) ? "K" + airportList[i] : airportList[i];
+    for (var i = 0; i < this.airportList.length; i++) {
+      var airportKey = (this.airportList[i].length === 3) ? "K" + this.airportList[i] : this.airportList[i];
 
       if (!(airportKey in this.wxdata)) {
         if (airportKey) notFound += airportKey + " ";
@@ -145,7 +149,7 @@ Module.register("MMM-aviationwx", {
       // Show Airport Name and any delays
       var nameCell = document.createElement("td");
       nameCell.className = "bright nodec left-align";
-      var tafUrl = "https://aviationweather.gov/taf/data?ids=" + icao + "&format=decoded&metars=on&layout=on";
+      var tafUrl = "https://aviationweather.gov/api/data/taf?ids=" + icao + "&format=decoded&metars=on&layout=on";
       nameCell.innerHTML = this.wrapInLink(iata, tafUrl) + "&nbsp;";
       nameCell.setAttribute("title", name + " Airport");
       if (delay === 1) {
@@ -229,16 +233,18 @@ Module.register("MMM-aviationwx", {
 
   // Data Handling Functions
   getWX: function () {
-    var metarUrl = "https://aviationweather.gov/gis/scripts/MetarJSON.php?density=all"; 
-    var FAAUrl = "http://services.faa.gov/airport/status/<IATA_CODE>?format=application/json"
-    var payload = [this.config.airports, metarUrl, FAAUrl];
+    //var metarUrl = "https://aviationweather.gov/gis/scripts/MetarJSON.php?density=all"; 
+    var metarUrl = "https://aviationweather.gov/data/cache/metars.cache.xml.gz"
+    var FAAUrl = "https://nasstatus.faa.gov/api/airport-status-information"
+    var payload = { airportList: this.config.airports, metraUrl: metarUrl, faaUrl: FAAUrl, debug: this.config.debug };
+    
     this.sendSocketNotification("GET_WX", payload);
   },
 
   socketNotificationReceived: function(notification, payload) {
     if (notification === "WX_RESULT") {
       this.wxdata = payload;
-      this.updateDom(self.config.fadeSpeed);
+      this.updateDom(this.config.fadeSpeed);
     }    
   },
 });
