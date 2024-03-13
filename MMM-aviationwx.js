@@ -90,6 +90,11 @@ Module.register("MMM-aviationwx", {
         continue;
       }
 
+      ///
+      ///  updates to variable names and values starting here 
+      /// see sample_data.txt for format and names
+      ///
+
       // Pull out variables for display
       var airport = this.wxdata[airportKey];
       var icao = airport.id;
