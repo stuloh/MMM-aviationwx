@@ -239,7 +239,7 @@ Module.register("MMM-aviationwx", {
   // Data Handling Functions
   getWX: function () {
     //var metarUrl = "https://aviationweather.gov/gis/scripts/MetarJSON.php?density=all"; 
-    var metarUrl = "https://aviationweather.gov/data/cache/metars.cache.xml.gz"
+    var metarUrl = "https://aviationweather.gov/api/data/metar?format=json&taf=true&hours=1&ids=" 
     var FAAUrl = "https://nasstatus.faa.gov/api/airport-status-information"
     var payload = { airportList: this.config.airports, metraUrl: metarUrl, faaUrl: FAAUrl, debug: this.config.debug };
     
