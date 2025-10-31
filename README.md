@@ -1,5 +1,7 @@
 # Module: Aviation Weather (MMM-aviationwx)
 
+**THIS MODULE IS NO LONGER MAINTAINED. FEEL FREE TO FORK IT IF YOU WISH TO KEEP DEVELOPING IT.**
+
 This is a module for <a href="https://github.com/MichMich/MagicMirror">MagicMirror</a>.
 
 `MMM-aviationwx` displays aviation weather information (METAR data) for continental U.S. airports on your MagicMirror. If
